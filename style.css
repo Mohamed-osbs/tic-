@@ -1,0 +1,360 @@
+/* ============================================================
+   style.css — Neon-Noir Tic-Tac-Toe
+   Design system: CSS custom properties for every key value
+   ============================================================ */
+
+/* ── Design Tokens ── */
+:root {
+  --bg:           #0a0a0f;
+  --surface:      #12121a;
+  --surface-2:    #1a1a27;
+  --border:       #2a2a3d;
+
+  --x-color:      #ff2d6b;        /* hot pink / neon red  */
+  --x-glow:       #ff2d6b66;
+  --o-color:      #00e5ff;        /* electric cyan        */
+  --o-glow:       #00e5ff55;
+
+  --draw-color:   #7c6af7;        /* soft violet          */
+  --accent:       #7c6af7;
+
+  --text-primary: #e8e8f0;
+  --text-muted:   #5a5a7a;
+
+  --cell-size:    clamp(85px, 22vw, 130px);
+  --gap:          10px;
+  --radius:       12px;
+  --radius-lg:    20px;
+
+  --font-display: 'Press Start 2P', monospace;
+  --font-body:    'Rajdhani', sans-serif;
+
+  --transition:   0.18s ease;
+}
+
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% -10%, #1a0f2e 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 110%, #0d1f3c 0%, transparent 60%);
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
+
+/* Grain / noise overlay for depth */
+.noise {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  z-index: 0;
+}
+
+/* ── App Container ── */
+.app {
+  position: relative;
+  z-index: 1;
+  width: min(480px, 95vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 24px 40px;
+}
+
+/* ── Header ── */
+.header { text-align: center; }
+
+.logo {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, var(--x-color) 0%, var(--o-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 20px #7c6af788);
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* ── Mode Bar ── */
+.mode-bar {
+  display: flex;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 5px;
+}
+
+.mode-btn {
+  padding: 8px 22px;
+  border: none;
+  border-radius: 50px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mode-btn.active {
+  background: var(--surface-2);
+  color: var(--text-primary);
+  box-shadow: 0 0 12px #7c6af733;
+}
+
+.mode-btn:hover:not(.active) {
+  color: var(--text-primary);
+}
+
+/* ── Scoreboard ── */
+.scoreboard {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.score-card.draws { opacity: 0.6; }
+
+.score-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.score-label.player-x { color: var(--x-color); }
+.score-label.player-o { color: var(--o-color); }
+.score-label         { color: var(--text-muted); }
+
+.score-value {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* Highlight active player's card */
+.score-card.active-x {
+  border-color: var(--x-color);
+  box-shadow: 0 0 18px var(--x-glow), inset 0 0 20px #ff2d6b0a;
+}
+.score-card.active-o {
+  border-color: var(--o-color);
+  box-shadow: 0 0 18px var(--o-glow), inset 0 0 20px #00e5ff0a;
+}
+
+/* ── Status Banner ── */
+.status-banner {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 24px;
+  border-radius: 50px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  text-align: center;
+}
+
+.status-banner.turn-x  { border-color: var(--x-color); color: var(--x-color); }
+.status-banner.turn-o  { border-color: var(--o-color); color: var(--o-color); }
+.status-banner.win     { animation: pulse-banner 0.8s ease infinite alternate; }
+.status-banner.draw    { border-color: var(--draw-color); color: var(--draw-color); }
+
+@keyframes pulse-banner {
+  from { box-shadow: none; }
+  to   { box-shadow: 0 0 24px currentColor; }
+}
+
+/* ── Board ── */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, var(--cell-size));
+  grid-template-rows:    repeat(3, var(--cell-size));
+  gap: var(--gap);
+  /* Subtle grid lines via background */
+  padding: 4px;
+}
+
+/* ── Cell ── */
+.cell {
+  position: relative;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 6vw, 2.5rem);
+  transition: background var(--transition), border-color var(--transition), transform 0.12s ease;
+  overflow: hidden;
+  /* Ripple origin */
+  user-select: none;
+}
+
+.cell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #ffffff08 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.cell:hover:not(.taken):not(.disabled)::before { opacity: 1; }
+.cell:hover:not(.taken):not(.disabled) {
+  border-color: #4a4a6a;
+  background: var(--surface-2);
+  transform: scale(1.03);
+}
+
+.cell:active:not(.taken):not(.disabled) { transform: scale(0.97); }
+
+/* Mark: X */
+.cell.x {
+  color: var(--x-color);
+  border-color: #ff2d6b44;
+  text-shadow: 0 0 18px var(--x-color), 0 0 40px var(--x-glow);
+}
+
+/* Mark: O */
+.cell.o {
+  color: var(--o-color);
+  border-color: #00e5ff44;
+  text-shadow: 0 0 18px var(--o-color), 0 0 40px var(--o-glow);
+}
+
+/* Winning cell glow */
+.cell.winner-x {
+  background: #ff2d6b15;
+  border-color: var(--x-color);
+  box-shadow: 0 0 28px var(--x-glow), inset 0 0 20px #ff2d6b18;
+  animation: winner-pulse-x 0.7s ease infinite alternate;
+}
+
+.cell.winner-o {
+  background: #00e5ff15;
+  border-color: var(--o-color);
+  box-shadow: 0 0 28px var(--o-glow), inset 0 0 20px #00e5ff18;
+  animation: winner-pulse-o 0.7s ease infinite alternate;
+}
+
+@keyframes winner-pulse-x {
+  from { box-shadow: 0 0 16px var(--x-glow); }
+  to   { box-shadow: 0 0 36px var(--x-color); }
+}
+@keyframes winner-pulse-o {
+  from { box-shadow: 0 0 16px var(--o-glow); }
+  to   { box-shadow: 0 0 36px var(--o-color); }
+}
+
+/* Pop-in animation for placed marks */
+.cell .mark {
+  display: inline-block;
+  animation: pop-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes pop-in {
+  from { transform: scale(0) rotate(-10deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);  opacity: 1; }
+}
+
+/* Disabled board after game over */
+.cell.disabled { cursor: not-allowed; }
+
+/* ── Controls ── */
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-control {
+  flex: 1;
+  padding: 13px 20px;
+  border: 1.5px solid var(--x-color);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--x-color);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-control:hover {
+  background: var(--x-color);
+  color: var(--bg);
+  box-shadow: 0 0 20px var(--x-glow);
+}
+
+.btn-control.secondary {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+}
+
+.btn-control.secondary:hover {
+  border-color: var(--draw-color);
+  background: var(--draw-color);
+  color: var(--bg);
+  box-shadow: 0 0 20px #7c6af766;
+}
+
+/* ── CPU Thinking Indicator ── */
+.cpu-thinking {
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: var(--o-color);
+  opacity: 0;
+  transition: opacity 0.2s;
+  height: 1em;
+}
+.cpu-thinking.visible { opacity: 1; }
+
+/* ── Responsive Tweaks ── */
+@media (max-width: 360px) {
+  :root { --cell-size: 90px; --gap: 8px; }
+  .app { padding: 20px 12px 32px; gap: 16px; }
+}
